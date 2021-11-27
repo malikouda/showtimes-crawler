@@ -70,7 +70,7 @@ def crawl():
             logging.warning(f"NO MATCHES FOUND for pattern: {pattern.pattern}")
 
     except Exception as e:
-        logging.error(f"There was while searching the page: {e}")
+        logging.error(f"There was a problem while searching the page: {e}")
     finally:
         driver.quit()
         logging.info(f"Application has completed and will terminate")
