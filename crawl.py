@@ -41,7 +41,7 @@ def crawl():
         logging.info(
             f"Searching for film title cards with regex pattern: {pattern.pattern}"
         )
-        elements = driver.find_elements_by_css_selector("div.film-item > h3 > a")
+        elements = driver.find_elements(By.CSS_SELECTOR, "div.film-item > h3 > a")
         for element in elements:
             match = pattern.match(element.text)
             if match:
