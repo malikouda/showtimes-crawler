@@ -47,11 +47,11 @@ def crawl():
             if match:
                 found = True
                 href = element.get_attribute("href")
+                logging.info(
+                    f"MATCH FOUND: Title card ({element.text}) matches pattern {pattern.pattern}. URL: {href}"
+                )
+                logging.info("Attempting to notify via Pushover")
                 try:
-                    logging.info(
-                        f"MATCH FOUND: Title card ({element.text}) matches pattern {pattern.pattern}. URL: {href}"
-                    )
-                    logging.info("Attempting to notify via Pushover")
                     notify(
                         title="Spider-Man: No Way Home Tickets On Sale",
                         message="Spider-Man: No Way Home tickets are on sale now at the Bob Bullock IMAX theater.",
