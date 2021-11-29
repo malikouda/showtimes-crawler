@@ -48,7 +48,7 @@ def crawl():
 
         logging.info("Checking showtimes for availability...")
         for elt in elts:
-            if elt.get_attribute("class") == "status--soldout":
+            if elt.get_attribute("class") != "status--soldout":
                 logging.info(
                     f"Found a showing that is not sold out at {elt.text}, notifying via Pushover..."
                 )
