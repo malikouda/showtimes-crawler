@@ -2,6 +2,8 @@ import re, logging
 
 from notify import notify
 
+from crontab import CronTab
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -58,6 +60,11 @@ def crawl():
                         url=href,
                         priority=1,
                     )
+                    cron = CronTab(user="malik")
+                    for job in cron:
+                        if job.comment == "spiderman":
+                            cron.remove(job)
+                            cron.write()
                     logging.info(f"Pushover notification sent")
                     break
                 except Exception as e:
