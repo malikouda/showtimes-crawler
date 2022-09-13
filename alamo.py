@@ -75,7 +75,10 @@ def crawl():
         with open("films.txt", "r") as f:
             last_found = set(f.read().splitlines())
 
+        print(found_films)
+        print(last_found)
         added_films = found_films - last_found
+        print(added_films)
 
         logging.info("Sending Pushover notification")
         new_film_str = "\n".join(sorted(list(added_films)))
