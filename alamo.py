@@ -46,17 +46,17 @@ def crawl():
             )
         )
         load_more_button = driver.find_element(
-            (By.XPATH, "//button[@ng-click='$ctrl.loadMore()']")
+            By.XPATH, "//button[@ng-click='$ctrl.loadMore()']"
         )
         load_more_button.click()
         sleep(10)
 
         logging.info("Getting list of all current films")
-        films = driver.find_elements((By.CLASS_NAME, "market-film"))
+        films = driver.find_elements(By.CLASS_NAME, "market-film")
         found_films = []
         alt_showings = {}
         for film in films:
-            title = film.find_element((By.CSS_SELECTOR, "alamo-card-title")).text
+            title = film.find_element(By.CSS_SELECTOR, "alamo-card-title").text
 
             if title in found_films:
                 if title in alt_showings:
