@@ -1,6 +1,7 @@
-import logging, random, requests
+import logging, random
 from time import sleep
 
+import requests
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,10 +9,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 from notify import notify
+from config import settings
 
-CONTEXT_IO_URL = "https://ctxt.io/new"
-
-print()
 
 logging.basicConfig(
     filename="showtimes.txt",
@@ -85,29 +84,32 @@ def crawl():
         new_film_str = "\n".join(sorted(list(added_films)))
         found_films = "\n".join(sorted(list(found_films)))
         if new_film_str:
-            notify(
-                title=f"{len(added_films)} New Film(s) Found at the Alamo Drafthouse",
-                message=requests.post(
-                    CONTEXT_IO_URL,
+            if len(new_film_str) > 1024:
+                # Pushover messages are limited to 1024 characters, so if we are larger than that
+                # we can use ctxt.io to store the message and send the ctxt URL instead
+                ctxt_url = requests.post(
+                    settings.CTXT_URL,
                     data={
                         "content": f"<pre><code>{new_film_str}</code></pre>",
                         "ttl": "1d",
                     },
-                ).url,
+                ).url
+                message = (
+                    f"{new_film_str[:512]}...\nSee the full list here:\n{ctxt_url}"
+                )
+            else:
+                message = new_film_str
+            notify(
+                title=f"{len(added_films)} New Film(s) Found at the Alamo Drafthouse",
+                message=message,
                 priority=0,
                 url=url,
             )
         else:
             notify(
                 title="No New Films Found at the Alamo Drafthouse",
-                message=requests.post(
-                    CONTEXT_IO_URL,
-                    data={
-                        "content": f"<pre><code>{found_films}</code></pre>",
-                        "ttl": "1d",
-                    },
-                ).url,
-                priority=-2,
+                message="No new films found.",
+                priority=-2,  # Don't send push notification
                 url=url,
             )
 
