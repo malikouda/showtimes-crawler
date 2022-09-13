@@ -1,4 +1,5 @@
 __pycache__
 .vscode
-vars.py
 *showtimes.txt
+.env
+films.txt

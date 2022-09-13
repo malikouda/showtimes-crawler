@@ -1,9 +1,9 @@
 import http.client, urllib
-from vars import APP_TOKEN, USER_KEY
+from config import settings
 
 
 def notify(
-    title: str, message: str, url: str, priority: int
+    title: str, message: str, priority: int = 0, url: str = ""
 ) -> http.client.HTTPResponse:
     conn = http.client.HTTPSConnection("api.pushover.net:443")
     conn.request(
@@ -11,8 +11,8 @@ def notify(
         "/1/messages.json",
         urllib.parse.urlencode(
             {
-                "token": APP_TOKEN,
-                "user": USER_KEY,
+                "token": settings.PUSHOVER_APP_TOKEN,
+                "user": settings.PUSHOVER_USER_KEY,
                 "title": title,
                 "message": message,
                 "url": url,

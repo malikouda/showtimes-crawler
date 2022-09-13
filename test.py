@@ -1,7 +1,8 @@
 from notify import notify
 
 notify(
-    title="Test",
-    message="test",
-    priority=1,
+    title="Test Notification",
+    message="This is a test message.",
+    priority=0,
+    url="https://example.com/",
 )
