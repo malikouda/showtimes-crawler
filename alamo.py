@@ -97,8 +97,7 @@ def crawl():
 
         logging.info("Writing found films to text file")
         with open("films.txt", "w") as f:
-            for film in found_films:
-                f.write(f"{film}\n")
+            f.write(found_films)
 
     except Exception as e:
         logging.error(f"There was a problem while running the program: {e}")
