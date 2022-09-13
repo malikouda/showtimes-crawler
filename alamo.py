@@ -1,4 +1,4 @@
-import logging, random
+import logging, random, requests
 from time import sleep
 
 from selenium import webdriver
@@ -8,6 +8,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 from notify import notify
+
+CONTEXT_IO_URL = "https://ctxt.io/new"
+
+print()
 
 logging.basicConfig(
     filename="showtimes.txt",
@@ -75,10 +79,7 @@ def crawl():
         with open("films.txt", "r") as f:
             last_found = set(f.read().splitlines())
 
-        print(found_films)
-        print(last_found)
         added_films = found_films - last_found
-        print(added_films)
 
         logging.info("Sending Pushover notification")
         new_film_str = "\n".join(sorted(list(added_films)))
@@ -86,14 +87,26 @@ def crawl():
         if new_film_str:
             notify(
                 title=f"{len(added_films)} New Film(s) Found at the Alamo Drafthouse",
-                message=new_film_str,
+                message=requests.post(
+                    CONTEXT_IO_URL,
+                    data={
+                        "content": f"<pre><code>{new_film_str}</code></pre>",
+                        "ttl": "1d",
+                    },
+                ).url,
                 priority=0,
                 url=url,
             )
         else:
             notify(
                 title="No New Films Found at the Alamo Drafthouse",
-                message=found_films,
+                message=requests.post(
+                    CONTEXT_IO_URL,
+                    data={
+                        "content": f"<pre><code>{found_films}</code></pre>",
+                        "ttl": "1d",
+                    },
+                ).url,
                 priority=-2,
                 url=url,
             )
