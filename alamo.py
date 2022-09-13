@@ -78,8 +78,8 @@ def crawl():
         added_films = found_films - last_found
 
         logging.info("Sending Pushover notification")
-        new_film_str = "\n".join(list(added_films))
-        found_films = "\n".join(list(found_films))
+        new_film_str = "\n".join(sorted(list(added_films)))
+        found_films = "\n".join(sorted(list(found_films)))
         if new_film_str:
             notify(
                 title=f"{len(added_films)} New Film(s) Found at the Alamo Drafthouse",
