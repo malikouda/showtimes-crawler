@@ -24,11 +24,11 @@ def crawl():
     sleep(random_sleep_time)
 
     url = "https://drafthouse.com/austin"
-    chrome_options = Options()
-    chrome_options.headless = True
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-gpu")
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+    options = Options()
+    options.headless = True
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-gpu")
+    driver = webdriver.Chrome(options=options)
 
     try:
         logging.info(f"Accessing url: {url}")
@@ -45,18 +45,18 @@ def crawl():
                 (By.XPATH, "//button[@ng-click='$ctrl.loadMore()']")
             )
         )
-        load_more_button = driver.find_element_by_xpath(
-            "//button[@ng-click='$ctrl.loadMore()']"
+        load_more_button = driver.find_element(
+            (By.XPATH, "//button[@ng-click='$ctrl.loadMore()']")
         )
         load_more_button.click()
         sleep(10)
 
         logging.info("Getting list of all current films")
-        films = driver.find_elements_by_class_name("market-film")
+        films = driver.find_elements((By.CLASS_NAME, "market-film"))
         found_films = []
         alt_showings = {}
         for film in films:
-            title = film.find_element_by_css_selector("alamo-card-title").text
+            title = film.find_element((By.CSS_SELECTOR, "alamo-card-title")).text
 
             if title in found_films:
                 if title in alt_showings:
