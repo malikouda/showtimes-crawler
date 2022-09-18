@@ -106,7 +106,7 @@ def crawl():
                 url=url,
             )
         else:
-            logging.info(f"No new films found. Found {len(found_films.split('\n'))} films total.")
+            logging.info(f"No new films found.")
 
         logging.info("Writing found films to text file")
         with open("films.txt", "w") as f:
