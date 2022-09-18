@@ -106,12 +106,7 @@ def crawl():
                 url=url,
             )
         else:
-            notify(
-                title="No New Films Found at the Alamo Drafthouse",
-                message="No new films found.",
-                priority=-2,  # Don't send push notification
-                url=url,
-            )
+            logging.info(f"No new films found. Found {len(found_films)} films total.")
 
         logging.info("Writing found films to text file")
         with open("films.txt", "w") as f:
@@ -119,6 +114,11 @@ def crawl():
 
     except Exception as e:
         logging.error(f"There was a problem while running the program: {e}")
+        notify(
+            "Alamo Drafthouse Scraper Error",
+            message=f"Scraper had an error: {e}",
+            priority=1,
+        )
     finally:
         driver.quit()
         logging.info(f"Application has completed and will terminate")
