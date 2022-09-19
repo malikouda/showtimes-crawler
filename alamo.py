@@ -88,7 +88,7 @@ def crawl():
         if new_film_str:
             logging.info(f"Found {num_new_films} new films of {num_total_films} total.")
             if len(new_film_str) > 1024:
-                logging.info(
+                logging.warn(
                     "List of films larger than 1024 characters. Sending to ctxt.io page and notifying via Pushover"
                 )
                 # Pushover messages are limited to 1024 characters, so if we are larger than that
