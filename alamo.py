@@ -80,11 +80,17 @@ def crawl():
 
         added_films = found_films - last_found
 
-        logging.info("Sending Pushover notification")
+        num_new_films = len(added_films)
+        num_total_films = len(found_films)
+
         new_film_str = "\n".join(sorted(list(added_films)))
         found_films = "\n".join(sorted(list(found_films)))
         if new_film_str:
+            logging.info(f"Found {num_new_films} new films of {num_total_films} total.")
             if len(new_film_str) > 1024:
+                logging.info(
+                    "List of films larger than 1024 characters. Sending to ctxt.io page and notifying via Pushover"
+                )
                 # Pushover messages are limited to 1024 characters, so if we are larger than that
                 # we can use ctxt.io to store the message and send the ctxt URL instead
                 ctxt_url = requests.post(
@@ -98,17 +104,18 @@ def crawl():
                     f"{new_film_str[:512]}...\nSee the full list here:\n{ctxt_url}"
                 )
             else:
+                logging.info("Notifying new films via Pushover.")
                 message = new_film_str
             notify(
-                title=f"{len(added_films)} New Film(s) Found at the Alamo Drafthouse",
+                title=f"{num_new_films} New Film(s) Found at the Alamo Drafthouse",
                 message=message,
                 priority=0,
                 url=url,
             )
         else:
-            logging.info(f"No new films found.")
+            logging.info(f"No new films found. Found {num_total_films} films.")
 
-        logging.info("Writing found films to text file")
+        logging.info("Updating film log with current film list.")
         with open("films.txt", "w") as f:
             f.write(found_films)
 
