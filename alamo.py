@@ -84,7 +84,7 @@ def crawl():
         num_total_films = len(found_films)
 
         new_film_str = "\n".join(sorted(list(added_films)))
-        found_films = "\n".join(sorted(list(found_films)))
+        found_films_str = "\n".join(sorted(list(found_films)))
         if new_film_str:
             logging.info(f"Found {num_new_films} new films of {num_total_films} total.")
             if len(new_film_str) > 1024:
@@ -117,7 +117,7 @@ def crawl():
 
         logging.info("Updating film log with current film list.")
         with open("films.txt", "w") as f:
-            f.write(found_films)
+            f.write(found_films_str)
 
     except Exception as e:
         logging.error(f"There was a problem while running the program: {e}")
