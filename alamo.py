@@ -22,7 +22,7 @@ logging.basicConfig(
 
 def crawl():
     logging.info("BEGIN APPLICATION")
-    random_sleep_time = random.randint(0, 31)
+    random_sleep_time = random.randint(0, 61)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
