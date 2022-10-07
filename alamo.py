@@ -24,12 +24,15 @@ def crawl():
     logging.info("BEGIN APPLICATION")
     random_sleep_time = random.randint(0, 61)
     logging.info("Sleeping for %s seconds", random_sleep_time)
-    sleep(random_sleep_time)
+    # sleep(random_sleep_time)
 
     url = "https://drafthouse.com/austin"
     options = Options()
     options.headless = True
     options.add_argument("--disable-extensions")
+    options.add_argument(
+        "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+    )
     options.add_argument("--disable-gpu")
     driver = webdriver.Chrome(options=options)
 
@@ -52,7 +55,7 @@ def crawl():
             By.XPATH, "//button[@ng-click='$ctrl.loadMore()']"
         )
         load_more_button.click()
-        sleep(10)
+        sleep(20)
 
         logging.info("Getting list of all current films")
         films = driver.find_elements(By.CLASS_NAME, "market-film")
