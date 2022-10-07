@@ -24,7 +24,7 @@ def crawl():
     logging.info("BEGIN APPLICATION")
     random_sleep_time = random.randint(0, 61)
     logging.info("Sleeping for %s seconds", random_sleep_time)
-    # sleep(random_sleep_time)
+    sleep(random_sleep_time)
 
     url = "https://drafthouse.com/austin"
     options = Options()
@@ -55,7 +55,7 @@ def crawl():
             By.XPATH, "//button[@ng-click='$ctrl.loadMore()']"
         )
         load_more_button.click()
-        sleep(20)
+        sleep(10)
 
         logging.info("Getting list of all current films")
         films = driver.find_elements(By.CLASS_NAME, "market-film")
