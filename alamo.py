@@ -64,6 +64,10 @@ def crawl():
         for film in films:
             title = film.find_element(By.CSS_SELECTOR, "alamo-card-title").text
 
+            # temporary fix - not sure why this movie keeps notifying
+            if "A NIGHTMARE ON ELM STREET" in title:
+                continue
+
             if title in found_films:
                 if title in alt_showings:
                     alt_showings[title] += 1
