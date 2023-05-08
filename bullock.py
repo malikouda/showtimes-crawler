@@ -1,4 +1,4 @@
-import logging, random
+import logging, random, re
 from time import sleep
 
 import requests
@@ -13,7 +13,7 @@ from config import settings
 
 
 logging.basicConfig(
-    filename="showtimes.txt",
+    filename="bullock_showtimes.txt",
     format="%(asctime)s :: %(levelname)s :: %(message)s",
     encoding="utf-8",
     level=logging.INFO,
@@ -21,12 +21,12 @@ logging.basicConfig(
 
 
 def crawl():
-    logging.info("BEGIN ALAMO APPLICATION")
+    logging.info("BEGIN BOB BULLOCK APPLICATION")
     random_sleep_time = random.randint(0, 61)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
-    url = "https://drafthouse.com/austin"
+    url = "https://www.thestoryoftexas.com/visit/see-films"
     options = Options()
     options.headless = True
     options.add_argument("--disable-extensions")
@@ -42,31 +42,18 @@ def crawl():
 
         logging.info("Waiting for page content")
         WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "film-wall"))
+            EC.presence_of_element_located((By.CLASS_NAME, "page-content"))
         )
-
-        logging.info("Loading all films")
-        WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//button[@ng-click='$ctrl.loadMore()']")
-            )
-        )
-        load_more_button = driver.find_element(
-            By.XPATH, "//button[@ng-click='$ctrl.loadMore()']"
-        )
-        load_more_button.click()
-        sleep(10)
+        sleep(3)
 
         logging.info("Getting list of all current films")
-        films = driver.find_elements(By.CLASS_NAME, "market-film")
+        films = driver.find_elements(By.CLASS_NAME, "film-container")
         found_films = []
         alt_showings = {}
+        re_remove_html_tag = re.compile("<.*?>")
         for film in films:
-            title = film.find_element(By.CSS_SELECTOR, "alamo-card-title").text
-
-            # temporary fix - not sure why this movie keeps notifying
-            if "A NIGHTMARE ON ELM STREET" in title:
-                continue
+            title = film.find_element(By.TAG_NAME, "a").get_attribute("title")
+            title = re.sub(re_remove_html_tag, "", title)
 
             if title in found_films:
                 if title in alt_showings:
@@ -82,7 +69,7 @@ def crawl():
         )
         found_films = set(found_films)
 
-        with open("films.txt", "r") as f:
+        with open("bullock_films.txt", "r") as f:
             last_found = set(f.read().splitlines())
 
         added_films = found_films - last_found
@@ -114,7 +101,7 @@ def crawl():
                 logging.info("Notifying new films via Pushover.")
                 message = new_film_str
             notify(
-                title=f"{num_new_films} New Film(s) Found at the Alamo Drafthouse",
+                title=f"{num_new_films} New Film(s) Found at Bob Bullock IMAX",
                 message=message,
                 priority=0,
                 url=url,
@@ -123,13 +110,13 @@ def crawl():
             logging.info(f"No new films found. Found {num_total_films} films.")
 
         logging.info("Updating film log with current film list.")
-        with open("films.txt", "w") as f:
+        with open("bullock_films.txt", "w") as f:
             f.write(found_films_str)
 
     except Exception as e:
         logging.error(f"There was a problem while running the program: {e}")
         notify(
-            "Alamo Drafthouse Scraper Error",
+            "Bob Bullock Scraper Error",
             message=f"Scraper had an error: {e}",
             priority=1,
         )
