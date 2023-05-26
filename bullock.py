@@ -52,17 +52,21 @@ def crawl():
         alt_showings = {}
         re_remove_html_tag = re.compile("<.*?>")
         for film in films:
-            title = film.find_element(By.TAG_NAME, "a").get_attribute("title")
-            title = re.sub(re_remove_html_tag, "", title)
+            showtimes_present = (
+                len(film.find_elements(By.XPATH, ".//a[text()='Showtimes']")) >= 1
+            )
+            if showtimes_present:
+                title = film.find_element(By.TAG_NAME, "a").get_attribute("title")
+                title = re.sub(re_remove_html_tag, "", title)
 
-            if title in found_films:
-                if title in alt_showings:
-                    alt_showings[title] += 1
+                if title in found_films:
+                    if title in alt_showings:
+                        alt_showings[title] += 1
+                    else:
+                        alt_showings[title] = 1
+                    found_films.append(f"{title} (ALT SHOWING #{alt_showings[title]})")
                 else:
-                    alt_showings[title] = 1
-                found_films.append(f"{title} (ALT SHOWING #{alt_showings[title]})")
-            else:
-                found_films.append(title)
+                    found_films.append(title)
 
         logging.info(
             "Films retrieved, comparing to last list to see if films have been added"
