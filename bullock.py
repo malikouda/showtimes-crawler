@@ -1,5 +1,6 @@
-import logging, random, re
+import logging, random, re, os
 from time import sleep
+from pathlib import Path
 
 import requests
 from selenium import webdriver
@@ -22,7 +23,7 @@ logging.basicConfig(
 
 def crawl():
     logging.info("BEGIN BOB BULLOCK APPLICATION")
-    random_sleep_time = random.randint(0, 61)
+    random_sleep_time = random.randint(0, 15)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
@@ -52,29 +53,32 @@ def crawl():
         alt_showings = {}
         re_remove_html_tag = re.compile("<.*?>")
         for film in films:
-            showtimes_present = (
-                len(film.find_elements(By.XPATH, ".//a[text()='Showtimes']")) >= 1
-            )
-            if showtimes_present:
-                title = film.find_element(By.TAG_NAME, "a").get_attribute("title")
-                title = re.sub(re_remove_html_tag, "", title)
+            title = film.find_element(By.TAG_NAME, "a").get_attribute("title")
+            title = re.sub(re_remove_html_tag, "", title)
+            title = title.strip()
 
-                if title in found_films:
-                    if title in alt_showings:
-                        alt_showings[title] += 1
-                    else:
-                        alt_showings[title] = 1
-                    found_films.append(f"{title} (ALT SHOWING #{alt_showings[title]})")
+            if title in found_films:
+                if title in alt_showings:
+                    alt_showings[title] += 1
                 else:
-                    found_films.append(title)
+                    alt_showings[title] = 1
+                found_films.append(f"{title} (ALT SHOWING #{alt_showings[title]})")
+            else:
+                found_films.append(title)
 
         logging.info(
             "Films retrieved, comparing to last list to see if films have been added"
         )
         found_films = set(found_films)
 
-        with open("bullock_films.txt", "r") as f:
-            last_found = set(f.read().splitlines())
+        films_file = "bullock_films.txt"
+        if os.path.exists(films_file):
+            with open(films_file, "r") as f:
+                last_found = set(f.read().splitlines())
+        else:
+            file_path = Path(films_file)
+            file_path.touch()
+            last_found = set()
 
         added_films = found_films - last_found
 
@@ -114,7 +118,7 @@ def crawl():
             logging.info(f"No new films found. Found {num_total_films} films.")
 
         logging.info("Updating film log with current film list.")
-        with open("bullock_films.txt", "w") as f:
+        with open(films_file, "w") as f:
             f.write(found_films_str)
 
     except Exception as e:

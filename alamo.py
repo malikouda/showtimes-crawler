@@ -1,5 +1,6 @@
-import logging, random
+import logging, random, os
 from time import sleep
+from pathlib import Path
 
 import requests
 from selenium import webdriver
@@ -22,7 +23,7 @@ logging.basicConfig(
 
 def crawl():
     logging.info("BEGIN ALAMO APPLICATION")
-    random_sleep_time = random.randint(0, 61)
+    random_sleep_time = random.randint(0, 15)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
@@ -64,10 +65,6 @@ def crawl():
         for film in films:
             title = film.find_element(By.CSS_SELECTOR, "alamo-card-title").text
 
-            # temporary fix - not sure why this movie keeps notifying
-            if "A NIGHTMARE ON ELM STREET" in title:
-                continue
-
             if title in found_films:
                 if title in alt_showings:
                     alt_showings[title] += 1
@@ -82,8 +79,14 @@ def crawl():
         )
         found_films = set(found_films)
 
-        with open("films.txt", "r") as f:
-            last_found = set(f.read().splitlines())
+        films_file = "films.txt"
+        if os.path.exists(films_file):
+            with open(films_file, "r") as f:
+                last_found = set(f.read().splitlines())
+        else:
+            file_path = Path(films_file)
+            file_path.touch()
+            last_found = set()
 
         added_films = found_films - last_found
 
@@ -123,7 +126,7 @@ def crawl():
             logging.info(f"No new films found. Found {num_total_films} films.")
 
         logging.info("Updating film log with current film list.")
-        with open("films.txt", "w") as f:
+        with open(films_file, "w") as f:
             f.write(found_films_str)
 
     except Exception as e:
