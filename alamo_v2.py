@@ -35,7 +35,8 @@ def chunk_respect_line_break(text, chunk_size):
 
 
 def crawl():
-    logging.info("BEGIN ALAMO APPLICATION")
+    border = "-" * 10
+    logging.info("{0} BEGIN ALAMO APPLICATION {0}".format(border))
     random_sleep_time = random.randint(1, 5)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
@@ -43,6 +44,7 @@ def crawl():
     url = "https://drafthouse.com/s/mother/v2/schedule/market/austin"
 
     try:
+        logging.info(f"Retrieving all shows from: {url}")
         data = requests.get(url).json()["data"]
 
         presentations = data["presentations"]
@@ -103,9 +105,6 @@ def crawl():
             )
             for i, message in enumerate(messages):
                 sleep(1)
-                logging.info(
-                    f"Notifying new films via Pushover ({i+1} of {len(messages)})."
-                )
                 notification_title = f"{len(new_show_slugs)} New Film{'s' if len(new_show_slugs) > 1 else ''} Found at the Alamo Drafthouse"
                 logging.info(f"Sending notification: {notification_title}")
                 if len(messages) > 1:
@@ -132,6 +131,8 @@ def crawl():
             message=f"Scraper had an error: {str(e)}",
             priority=1,
         )
+    
+    logging.info("{0} END ALAMO APPLICATION {0}".format(border))
 
 
 if __name__ == "__main__":
