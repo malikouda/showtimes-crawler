@@ -118,8 +118,7 @@ def crawl():
             logging.info(f"No new films found. Found {len(current_show_slugs)} films.")
 
         current_shows_slug_str = "\n".join(sorted(list(current_show_slugs)))
-
-        logging.info("Updating film log with current film list.")
+        
         with open(shows_file, "w") as f:
             f.write(current_shows_slug_str)
 
