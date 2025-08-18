@@ -44,7 +44,6 @@ def crawl():
     url = "https://drafthouse.com/s/mother/v2/schedule/market/austin"
 
     try:
-        logging.info(f"Retrieving all shows from: {url}")
         data = requests.get(url).json()["data"]
 
         presentations = data["presentations"]
