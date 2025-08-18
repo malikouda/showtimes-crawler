@@ -69,13 +69,27 @@ def crawl():
 
         shows_to_notify = [shows[slug] for slug in new_show_slugs]
 
+        overlapping_tags = ["Movie Party"]
+
         new_shows_titles = []
         for show in shows_to_notify:
             msg = ""
-            if show.event_type:
-                msg += f"{show.event_type} - "
-            if show.super_title:
-                msg += f"{show.super_title} - "
+            if (
+                show.event_type
+                and show.super_title
+                and (
+                    show.event_type == show.super_title
+                    or f"{show.event_type}s" == show.super_title
+                    or f"{show.event_type}" in overlapping_tags
+                    or f"{show.super_title}" in overlapping_tags
+                )
+            ):
+                msg += f"[{show.event_type}] "
+            else:
+                if show.event_type:
+                    msg += f"[{show.event_type}] "
+                if show.super_title:
+                    msg += f"[{show.super_title}] "
             msg += show.title
             new_shows_titles.append(msg)
 
@@ -95,8 +109,13 @@ def crawl():
                 logging.info(
                     f"Sending notification: {len(new_show_slugs)} New Film(s) Found at the Alamo Drafthouse ({i+1} of {len(messages)})"
                 )
+                notification_title = (
+                    f"{len(new_show_slugs)} New Film{'s' if len(new_show_slugs) > 1 else ''} Found at the Alamo Drafthouse"
+                )
+                if len(messages) > 1:
+                    notification_title += f" ({i+1}/{len(messages)})"
                 notify(
-                    title=f"{len(new_show_slugs)} New Film(s) Found at the Alamo Drafthouse ({i+1} of {len(messages)})",
+                    title=notification_title,
                     message=message.strip(),
                     priority=0,
                     url=url,
