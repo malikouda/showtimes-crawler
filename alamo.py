@@ -130,10 +130,10 @@ def crawl():
             f.write(found_films_str)
 
     except Exception as e:
-        logging.error(f"There was a problem while running the program: {e}")
+        logging.error(f"There was a problem while running the program: {str(e)}")
         notify(
             "Alamo Drafthouse Scraper Error",
-            message=f"Scraper had an error: {e}",
+            message=f"Scraper had an error: {str(e)}",
             priority=1,
         )
     finally:
