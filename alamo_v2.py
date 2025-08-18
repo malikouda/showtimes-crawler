@@ -109,9 +109,7 @@ def crawl():
                 logging.info(
                     f"Sending notification: {len(new_show_slugs)} New Film(s) Found at the Alamo Drafthouse ({i+1} of {len(messages)})"
                 )
-                notification_title = (
-                    f"{len(new_show_slugs)} New Film{'s' if len(new_show_slugs) > 1 else ''} Found at the Alamo Drafthouse"
-                )
+                notification_title = f"{len(new_show_slugs)} New Film{'s' if len(new_show_slugs) > 1 else ''} Found at the Alamo Drafthouse"
                 if len(messages) > 1:
                     notification_title += f" ({i+1}/{len(messages)})"
                 notify(
