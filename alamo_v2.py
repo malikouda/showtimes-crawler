@@ -16,7 +16,7 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-
+# This function chunks text but won't chunk in the middle of a line
 def chunk_respect_line_break(text, chunk_size):
     if not text:
         return None
@@ -37,6 +37,7 @@ def chunk_respect_line_break(text, chunk_size):
 def crawl():
     border = "-" * 10
     logging.info("{0} BEGIN ALAMO APPLICATION {0}".format(border))
+
     random_sleep_time = random.randint(1, 5)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
@@ -49,13 +50,18 @@ def crawl():
         presentations = data["presentations"]
         shows = dict()
         for p in presentations:
+            # Unpacking nested data
             show = Show(
+                # eventType and superTitle are always present but may contain nulls, 
+                # so 'or {}' avoids returning a NoneType to the chained .get() call
                 event_type=(p.get("eventType") or {}).get("title"),
                 super_title=(p.get("superTitle") or {}).get("superTitle"),
                 title=p["show"]["title"],
             )
             shows[p["slug"]] = show
 
+        # A 'slug' in this case is a unique str identifier for the presentation
+        # Get existing slugs from text file and convert to set for set ops
         shows_file = "films_v2.txt"
         if os.path.exists(shows_file):
             with open(shows_file, "r") as f:
@@ -65,9 +71,12 @@ def crawl():
             file_path.touch()
             existing_show_slugs = set()
 
+        # Turn the retrieved slugs into a set for set ops
         current_show_slugs = set(slug for slug in shows.keys())
+        # Get all the new shows by subtracting the existing shows from the retrieved shows
         new_show_slugs = current_show_slugs - existing_show_slugs
 
+        # Get the title for every new show
         shows_to_notify = [shows[slug] for slug in new_show_slugs]
 
         overlapping_tags = ["Movie Party"]
@@ -75,18 +84,21 @@ def crawl():
         new_shows_titles = []
         for show in shows_to_notify:
             msg = ""
+            # Some event types / super titles heavily overlap
+            # For example, event type "Movie Party" and super title "Movie Parties"
+            # These are redundant, so just use the event type in cases like this
             if (
                 show.event_type
                 and show.super_title
                 and (
-                    show.event_type == show.super_title
-                    or f"{show.event_type}s" == show.super_title
-                    or f"{show.event_type}" in overlapping_tags
-                    or f"{show.super_title}" in overlapping_tags
+                    show.event_type == show.super_title # Event type and super title are the same
+                    or f"{show.event_type}s" == show.super_title # Event type is the simple plural of super title
+                    or f"{show.event_type}" in overlapping_tags # Manual override for certain event types
+                    or f"{show.super_title}" in overlapping_tags # Manual override for certain super titles
                 )
             ):
                 msg += f"[{show.event_type}] "
-            else:
+            else: # otherwise, use both as "tags"
                 if show.event_type:
                     msg += f"[{show.event_type}] "
                 if show.super_title:
@@ -94,8 +106,10 @@ def crawl():
             msg += show.title
             new_shows_titles.append(msg)
 
+        # Takes all the generated titles with tags and turns them into a list with line breaks, sorted by title
         new_shows_notification_msg = "\n".join((sorted(new_shows_titles)))
 
+        # Pushover can only handle 1024 characters at a time, so chunk to that size if necessary
         messages = chunk_respect_line_break(new_shows_notification_msg, 1024)
 
         if messages:
@@ -117,8 +131,10 @@ def crawl():
         else:
             logging.info(f"No new films found. Found {len(current_show_slugs)} films.")
 
+        # Generate list to write to output file to compare to next time
         current_shows_slug_str = "\n".join(sorted(list(current_show_slugs)))
-        
+
+        # Overwrite existing list of shows with current list
         with open(shows_file, "w") as f:
             f.write(current_shows_slug_str)
 
