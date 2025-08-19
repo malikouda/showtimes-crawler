@@ -2,12 +2,15 @@ import logging, random, os
 from time import sleep
 from pathlib import Path
 from collections import namedtuple
+from datetime import datetime
 
 import requests
 
 from notify import notify
 
-Show = namedtuple("Show", ["event_type", "super_title", "title"])
+Show = namedtuple(
+    "Show", ["event_type", "super_title", "title", "date_start", "date_end"]
+)
 
 logging.basicConfig(
     filename="showtimes_v2.txt",
@@ -15,6 +18,7 @@ logging.basicConfig(
     encoding="utf-8",
     level=logging.INFO,
 )
+
 
 # This function chunks text but won't chunk in the middle of a line
 def chunk_respect_line_break(text, chunk_size):
@@ -48,15 +52,31 @@ def crawl():
         data = requests.get(url).json()["data"]
 
         presentations = data["presentations"]
+        sessions = data["sessions"]
         shows = dict()
         for p in presentations:
+            # Get first and last date for showings
+            dates = [
+                s["businessDateClt"]
+                for s in sessions
+                if s["presentationSlug"] == p["slug"]
+            ]
+            if not dates:
+                print(p["slug"])
+            if dates:
+                date_start, date_end = min(dates), max(dates)
+            else:
+                date_start, date_end = None, None
+
             # Unpacking nested data
             show = Show(
-                # eventType and superTitle are always present but may contain nulls, 
+                # eventType and superTitle are always present but may contain nulls,
                 # so 'or {}' avoids returning a NoneType to the chained .get() call
                 event_type=(p.get("eventType") or {}).get("title"),
                 super_title=(p.get("superTitle") or {}).get("superTitle"),
                 title=p["show"]["title"],
+                date_start=date_start,
+                date_end=date_end,
             )
             shows[p["slug"]] = show
 
@@ -91,19 +111,45 @@ def crawl():
                 show.event_type
                 and show.super_title
                 and (
-                    show.event_type == show.super_title # Event type and super title are the same
-                    or f"{show.event_type}s" == show.super_title # Event type is the simple plural of super title
-                    or f"{show.event_type}" in overlapping_tags # Manual override for certain event types
-                    or f"{show.super_title}" in overlapping_tags # Manual override for certain super titles
+                    show.event_type
+                    == show.super_title  # Event type and super title are the same
+                    or f"{show.event_type}s"
+                    == show.super_title  # Event type is the simple plural of super title
+                    or f"{show.event_type}"
+                    in overlapping_tags  # Manual override for certain event types
+                    or f"{show.super_title}"
+                    in overlapping_tags  # Manual override for certain super titles
                 )
             ):
                 msg += f"[{show.event_type}] "
-            else: # otherwise, use both as "tags"
+            else:  # otherwise, use both as "tags"
                 if show.event_type:
                     msg += f"[{show.event_type}] "
                 if show.super_title:
                     msg += f"[{show.super_title}] "
             msg += show.title
+
+            IN_FORMAT = "%Y-%m-%d"
+            OUT_FORMAT = "%b %d"
+
+            if show.date_start or show.date_end:
+                date_start = datetime.strptime(show.date_start, IN_FORMAT)
+                date_end = datetime.strptime(show.date_end, IN_FORMAT)
+
+                if date_start == date_end:
+                    msg += " (" + datetime.strftime(date_start, OUT_FORMAT) + ")"
+                else:
+                    msg += (
+                        " ("
+                        + datetime.strftime(date_start, OUT_FORMAT)
+                        + "-"
+                        + datetime.strftime(date_end, OUT_FORMAT)
+                        + ")"
+                    )
+
+            else:
+                msg += " (no dates yet)"
+
             new_shows_titles.append(msg)
 
         # Takes all the generated titles with tags and turns them into a list with line breaks, sorted by title
@@ -140,12 +186,12 @@ def crawl():
 
     except Exception as e:
         logging.error("There was a problem while running the program: %s", str(e))
-        notify(
-            "Alamo Drafthouse Scraper Error",
-            message=f"Scraper had an error: {str(e)}",
-            priority=1,
-        )
-    
+        # notify(
+        #     "Alamo Drafthouse Scraper Error",
+        #     message=f"Scraper had an error: {str(e)}",
+        #     priority=1,
+        # )
+
     logging.info("{0} END ALAMO APPLICATION {0}".format(border))
 
 
