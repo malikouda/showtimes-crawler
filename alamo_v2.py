@@ -61,8 +61,7 @@ def crawl():
                 for s in sessions
                 if s["presentationSlug"] == p["slug"]
             ]
-            if not dates:
-                print(p["slug"])
+            
             if dates:
                 date_start, date_end = min(dates), max(dates)
             else:
@@ -186,11 +185,11 @@ def crawl():
 
     except Exception as e:
         logging.error("There was a problem while running the program: %s", str(e))
-        # notify(
-        #     "Alamo Drafthouse Scraper Error",
-        #     message=f"Scraper had an error: {str(e)}",
-        #     priority=1,
-        # )
+        notify(
+            "Alamo Drafthouse Scraper Error",
+            message=f"Scraper had an error: {str(e)}",
+            priority=1,
+        )
 
     logging.info("{0} END ALAMO APPLICATION {0}".format(border))
 
