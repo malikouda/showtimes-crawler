@@ -126,7 +126,7 @@ def crawl():
                     title=notification_title,
                     message=message.strip(),
                     priority=0,
-                    url=url,
+                    # url=url,
                 )
         else:
             logging.info(f"No new films found. Found {len(current_show_slugs)} films.")
