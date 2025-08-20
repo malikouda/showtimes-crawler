@@ -1,7 +1,6 @@
 __pycache__
 .vscode
-*showtimes*.txt
+*.txt
 .env
-*films*.txt
 vars.py
 *venv/
