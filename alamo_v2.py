@@ -13,7 +13,7 @@ Show = namedtuple(
 )
 
 logging.basicConfig(
-    filename="showtimes_v2.txt",
+    filename="logs/showtimes_v2.txt",
     format="%(asctime)s :: %(levelname)s :: %(message)s",
     encoding="utf-8",
     level=logging.INFO,

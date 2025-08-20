@@ -12,7 +12,7 @@ from notify import notify
 
 
 logging.basicConfig(
-    filename="universal.txt",
+    filename="logs/universal.txt",
     format="%(asctime)s :: %(levelname)s :: %(message)s",
     encoding="utf-8",
     level=logging.INFO,

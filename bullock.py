@@ -14,7 +14,7 @@ from config import settings
 
 
 logging.basicConfig(
-    filename="bullock_showtimes.txt",
+    filename="logs/bullock_showtimes.txt",
     format="%(asctime)s :: %(levelname)s :: %(message)s",
     encoding="utf-8",
     level=logging.INFO,
