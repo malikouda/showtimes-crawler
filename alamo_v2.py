@@ -61,7 +61,7 @@ def crawl():
                 for s in sessions
                 if s["presentationSlug"] == p["slug"]
             ]
-            
+
             if dates:
                 date_start, date_end = min(dates), max(dates)
             else:

@@ -25,9 +25,7 @@ def crawl():
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
-    url = (
-        "https://www.universalorlando.com/web-store/en/us/add-ons"
-    )
+    url = "https://www.universalorlando.com/web-store/en/us/add-ons"
     options = Options()
     options.headless = True
     options.add_argument("--disable-extensions")
@@ -40,7 +38,7 @@ def crawl():
     try:
         logging.info(f"Accessing url: {url}")
         driver.get(url)
-        
+
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CLASS_NAME, "page-content"))
         )
@@ -106,22 +104,28 @@ def crawl():
             )
         )
 
-        inner_window = driver.find_element(By.CSS_SELECTOR, "div[class='purchase-product-content multi-day']")
+        inner_window = driver.find_element(
+            By.CSS_SELECTOR, "div[class='purchase-product-content multi-day']"
+        )
         body = driver.find_element(By.TAG_NAME, "body").text
         while "December 2025" not in body:
             driver.implicitly_wait(5)
             inner_window.click()
             inner_window.send_keys(Keys.PAGE_DOWN)
             body = driver.find_element(By.TAG_NAME, "body").text
-        
-        september_header = driver.find_element(By.XPATH, '//div[text()="September 2025"]')
+
+        september_header = driver.find_element(
+            By.XPATH, '//div[text()="September 2025"]'
+        )
 
         calendar = september_header.find_element(By.XPATH, "./ancestor::gds-calendar")
 
-        date_range = range(8,13)
+        date_range = range(8, 13)
 
         for date in date_range:
-            day = calendar.find_element(By.CSS_SELECTOR, f'[aria-label*="VIP Experience - Sep {date}, 2025"]')
+            day = calendar.find_element(
+                By.CSS_SELECTOR, f'[aria-label*="VIP Experience - Sep {date}, 2025"]'
+            )
             label = day.get_attribute("aria-label")
             if "Unavailable" not in label:
                 notify(
