@@ -81,7 +81,7 @@ def crawl():
 
         # A 'slug' in this case is a unique str identifier for the presentation
         # Get existing slugs from text file and convert to set for set ops
-        shows_file = "films_v2.txt"
+        shows_file = "data/films_v2.txt"
         if os.path.exists(shows_file):
             with open(shows_file, "r") as f:
                 existing_show_slugs = set(f.read().splitlines())

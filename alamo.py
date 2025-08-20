@@ -79,7 +79,7 @@ def crawl():
         )
         found_films = set(found_films)
 
-        films_file = "films.txt"
+        films_file = "data/films.txt"
         if os.path.exists(films_file):
             with open(films_file, "r") as f:
                 last_found = set(f.read().splitlines())

@@ -1,4 +1,5 @@
 #!/bin/bash
-> /home/malik/bullock_showtimes.txt
-> /home/malik/showtimes.txt
-> /home/malik/showtimes_v2.txt
+> /home/malik/logs/bullock_showtimes.txt
+> /home/malik/logs/showtimes.txt
+> /home/malik/logs/showtimes_v2.txt
+> /home/malik/logs/universal.txt
