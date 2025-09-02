@@ -21,14 +21,13 @@ logging.basicConfig(
 
 def crawl():
     logging.info("BEGIN APPLICATION")
-    random_sleep_time = random.randint(0, 15)
+    random_sleep_time = random.randint(0, 30)
     logging.info("Sleeping for %s seconds", random_sleep_time)
     sleep(random_sleep_time)
 
-    url = "https://www.universalorlando.com/web-store/en/us/add-ons"
+    url = "https://www.universalorlando.com/web-store/en/us/add-ons?%20tab=Most%20Popular"
     options = Options()
     options.add_argument("--headless=new")
-    options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-extensions")
     options.add_argument(
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
